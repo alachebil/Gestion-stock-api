@@ -1,6 +1,7 @@
 const MatierePremiere = require("../models/MatierePremiere");
 const ProduitSemiPret = require("../models/ProduitSemiPret");
 const ProduitFinal = require("../models/ProduitFinal");
+const TransformationHistory = require("../models/TransformationHistory");
 
 // ==================== MATIERE PREMIERE ====================
 
@@ -78,6 +79,16 @@ exports.deleteProduitSemiPret = async (req, res) => {
   }
 };
 
+exports.updateProduitSemiPret = async (req, res) => {
+  try {
+    const item = await ProduitSemiPret.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!item) return res.status(404).json({ message: "Produit semi-prêt introuvable" });
+    res.status(200).json(item);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // ==================== PRODUIT FINAL ====================
 
 exports.createProduitFinal = async (req, res) => {
@@ -109,6 +120,16 @@ exports.deleteProduitFinal = async (req, res) => {
   }
 };
 
+exports.updateProduitFinal = async (req, res) => {
+  try {
+    const item = await ProduitFinal.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!item) return res.status(404).json({ message: "Produit final introuvable" });
+    res.status(200).json(item);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // ==================== TRANSFORMATION: MP -> Semi-Prêt ====================
 // Consomme de la matière première pour produire du produit semi-prêt
 exports.transformerEnSemiPret = async (req, res) => {
@@ -133,6 +154,14 @@ exports.transformerEnSemiPret = async (req, res) => {
 
     await matiere.save();
     await semiPret.save();
+
+    await TransformationHistory.create({
+      type: "MP→SemiPret",
+      sourceNom: matiere.nom,
+      destinationNom: semiPret.nom,
+      quantiteKg,
+      dateTransformation: new Date(),
+    });
 
     res.status(200).json({
       message: `Transformation réussie: ${quantiteKg} kg de matière première → produit semi-prêt`,
@@ -169,6 +198,14 @@ exports.transformerEnFinal = async (req, res) => {
     await semiPret.save();
     await final_.save();
 
+    await TransformationHistory.create({
+      type: "SemiPret→Final",
+      sourceNom: semiPret.nom,
+      destinationNom: final_.nom,
+      quantiteKg,
+      dateTransformation: new Date(),
+    });
+
     res.status(200).json({
       message: `Transformation réussie: ${quantiteKg} kg de semi-prêt → produit final`,
       semiPret,
@@ -201,6 +238,16 @@ exports.getStockSummary = async (req, res) => {
       produitsSemiPrets: semiPrets,
       produitsFinals: finals,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ==================== HISTORIQUE DES TRANSFORMATIONS ====================
+exports.getTransformationHistory = async (req, res) => {
+  try {
+    const history = await TransformationHistory.find().sort({ dateTransformation: -1 });
+    res.status(200).json(history);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

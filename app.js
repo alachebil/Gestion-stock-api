@@ -6,9 +6,8 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var connectDB = require("./config");
 var usersRouter = require("./routes/users");
-var blRouter = require("./routes/blRoutes");
+const factureRoutes = require("./routes/factureRoutes");
 const reclamationRoutes = require("./routes/reclamationRoutes");
-const livraisonRoutes = require("./routes/livraisonRoutes");
 
 const proxmoxRoutes = require("./routes/proxmoxRoutes"); // Importer les routes Proxmox
 const pipelineRoute = require("./routes/pipelineRoute");
@@ -29,10 +28,9 @@ app.use(logger("dev"));
 app.use(express.json({ limit: "2gb" }));
 app.use(express.urlencoded({ limit: "2gb", extended: true }));
 app.use(cookieParser());
-app.use("/bl", blRouter);
+app.use("/facture", factureRoutes);
 app.use("/users", usersRouter);
 app.use("/reclamation", reclamationRoutes);
-app.use("/livraison", livraisonRoutes);
 app.use("/pipeline", pipelineRoute);
 
 // Routes Proxmox
