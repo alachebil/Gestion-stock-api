@@ -1,0 +1,24 @@
+const mongoose = require("mongoose");
+
+const stockCounterSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      enum: ["matiere", "semi-pret-base", "semi-pret-bargatere", "final-base", "final-bargatere"],
+      required: true,
+      unique: true,
+    },
+    totalKg: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
+
+stockCounterSchema.statics.getOrCreate = async function (type) {
+  let counter = await this.findOne({ type });
+  if (!counter) {
+    counter = await this.create({ type, totalKg: 0 });
+  }
+  return counter;
+};
+
+module.exports = mongoose.model("StockCounter", stockCounterSchema);

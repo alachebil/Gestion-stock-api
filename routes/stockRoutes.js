@@ -17,6 +17,7 @@ router.delete("/semi-pret/:id", stockController.deleteProduitSemiPret);
 // Produit Final
 router.post("/final", stockController.createProduitFinal);
 router.get("/final", stockController.getAllProduitFinals);
+router.put("/final/etat/:id", stockController.toggleEtatProduitFinal);
 router.put("/final/:id", stockController.updateProduitFinal);
 router.delete("/final/:id", stockController.deleteProduitFinal);
 
@@ -27,7 +28,14 @@ router.post("/transformer/final", stockController.transformerEnFinal);
 // Résumé du stock
 router.get("/summary", stockController.getStockSummary);
 
+// Compteurs de stock
+router.get("/counters", stockController.getStockCounters);
+
+// Initialiser les compteurs à partir des entrées existantes
+router.post("/init-counters", stockController.initCounters);
+
 // Historique des transformations
 router.get("/transformations", stockController.getTransformationHistory);
+router.delete("/transformations/:id", stockController.deleteTransformationHistory);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const produitSemiPretSchema = new mongoose.Schema(
+const serviceFinalSchema = new mongoose.Schema(
   {
     nom: { type: String, required: true },
     type: {
@@ -9,8 +9,13 @@ const produitSemiPretSchema = new mongoose.Schema(
       required: true,
     },
     quantiteKg: { type: Number, required: true, default: 0 },
+    etat: {
+      type: String,
+      enum: ["dispo", "vendu"],
+      default: "dispo",
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ProduitSemiPret", produitSemiPretSchema);
+module.exports = mongoose.model("ServiceFinal", serviceFinalSchema);

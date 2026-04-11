@@ -1,4 +1,4 @@
-const Facture = require("../models/Facture");
+const ServiceFacture = require("../models/ServiceFacture");
 
 exports.createFacture = async (req, res) => {
   try {
@@ -18,7 +18,7 @@ exports.createFacture = async (req, res) => {
       return res.status(400).json({ message: "La quantité doit être supérieure à 0" });
     }
 
-    const facture = new Facture(req.body);
+    const facture = new ServiceFacture(req.body);
     await facture.save();
     res.status(201).json(facture);
   } catch (error) {
@@ -28,7 +28,7 @@ exports.createFacture = async (req, res) => {
 
 exports.getAllFactures = async (req, res) => {
   try {
-    const factures = await Facture.find().sort({ createdAt: -1 });
+    const factures = await ServiceFacture.find().sort({ createdAt: -1 });
     res.status(200).json(factures);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -37,7 +37,7 @@ exports.getAllFactures = async (req, res) => {
 
 exports.getFactureById = async (req, res) => {
   try {
-    const facture = await Facture.findById(req.params.id);
+    const facture = await ServiceFacture.findById(req.params.id);
     if (!facture) return res.status(404).json({ message: "Facture introuvable" });
     res.status(200).json(facture);
   } catch (error) {
@@ -63,7 +63,7 @@ exports.updateFacture = async (req, res) => {
       return res.status(400).json({ message: "La quantité doit être supérieure à 0" });
     }
 
-    const facture = await Facture.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const facture = await ServiceFacture.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!facture) return res.status(404).json({ message: "Facture introuvable" });
     res.status(200).json(facture);
   } catch (error) {
@@ -73,7 +73,7 @@ exports.updateFacture = async (req, res) => {
 
 exports.deleteFacture = async (req, res) => {
   try {
-    const facture = await Facture.findByIdAndDelete(req.params.id);
+    const facture = await ServiceFacture.findByIdAndDelete(req.params.id);
     if (!facture) return res.status(404).json({ message: "Facture introuvable" });
     res.status(200).json({ message: "Facture supprimée avec succès" });
   } catch (error) {

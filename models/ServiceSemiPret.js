@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const produitSemiPretSchema = new mongoose.Schema(
+const serviceSemiPretSchema = new mongoose.Schema(
   {
     nom: { type: String, required: true },
     type: {
@@ -13,4 +13,4 @@ const produitSemiPretSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ProduitSemiPret", produitSemiPretSchema);
+module.exports = mongoose.model("ServiceSemiPret", serviceSemiPretSchema);

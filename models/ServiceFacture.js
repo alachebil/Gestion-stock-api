@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
-const factureSchema = new mongoose.Schema(
+const serviceFactureSchema = new mongoose.Schema(
   {
     nomFournisseur: { type: String, required: true },
     numTelephone: { type: String, required: true },
-    refMatierePremiere: { type: String, required: true },
+    refProduit: { type: String, required: true },
     quantitePortee: { type: Number, required: true },
     prixTotal: { type: Number, required: true },
     prixUnite: { type: Number, required: true },
@@ -14,4 +14,4 @@ const factureSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Facture", factureSchema);
+module.exports = mongoose.model("ServiceFacture", serviceFactureSchema);

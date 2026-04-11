@@ -12,6 +12,9 @@ const reclamationRoutes = require("./routes/reclamationRoutes");
 const proxmoxRoutes = require("./routes/proxmoxRoutes"); // Importer les routes Proxmox
 const pipelineRoute = require("./routes/pipelineRoute");
 const stockRoutes = require("./routes/stockRoutes");
+const serviceStockRoutes = require("./routes/serviceStockRoutes");
+const serviceFactureRoutes = require("./routes/serviceFactureRoutes");
+const caisseRoutes = require("./routes/caisseRoutes");
 const cors = require("cors");
 var app = express();
 const allowedOrigins = [process.env.DNS];
@@ -36,6 +39,9 @@ app.use("/pipeline", pipelineRoute);
 // Routes Proxmox
 app.use("/proxmox", proxmoxRoutes); // Ajouter les routes Proxmox
 app.use("/stock", stockRoutes);
+app.use("/service-stock", serviceStockRoutes);
+app.use("/service-facture", serviceFactureRoutes);
+app.use("/caisse", caisseRoutes);
 
 app.use(function (req, res, next) {
   next(createError(404));
