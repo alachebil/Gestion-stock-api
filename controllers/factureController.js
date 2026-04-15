@@ -1,8 +1,10 @@
 const Facture = require("../models/Facture");
+const MatierePremiere = require("../models/MatierePremiere");
+const StockCounter = require("../models/StockCounter");
 
 exports.createFacture = async (req, res) => {
   try {
-    const { dateLivraison, prixDiverse, prixTotal, numTelephone, quantitePortee } = req.body;
+    const { dateLivraison, prixDiverse, prixTotal, numTelephone, quantitePortee, refMatierePremiere } = req.body;
 
     const todayStr = new Date().toISOString().split("T")[0];
     if (dateLivraison > todayStr) {
@@ -20,6 +22,21 @@ exports.createFacture = async (req, res) => {
 
     const facture = new Facture(req.body);
     await facture.save();
+
+    // Ajouter automatiquement la matière première
+    const existingMP = await MatierePremiere.findOne({ nom: refMatierePremiere });
+    if (existingMP) {
+      existingMP.quantiteKg += quantitePortee;
+      await existingMP.save();
+    } else {
+      await MatierePremiere.create({ nom: refMatierePremiere, quantiteKg: quantitePortee });
+    }
+
+    // Mettre à jour le stock total de matière première
+    const counter = await StockCounter.getOrCreate("matiere");
+    counter.totalKg += Number(quantitePortee);
+    await counter.save();
+
     res.status(201).json(facture);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -19,6 +19,7 @@ const clientRoutes = require("./routes/clientRoutes");
 const venteRoutes = require("./routes/venteRoutes");
 const cors = require("cors");
 var app = express();
+
 const allowedOrigins = [process.env.DNS];
 app.use(
   cors({
