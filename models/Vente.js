@@ -11,13 +11,13 @@ const venteSchema = new mongoose.Schema(
       {
         produitId: { type: mongoose.Schema.Types.ObjectId, required: true },
         nom: { type: String, required: true },
-        type: { type: String, enum: ["base", "bargatere"], required: true },
+        type: { type: String, enum: ["base", "bargataire"], required: true },
         quantiteKg: { type: Number, required: true },
       },
     ],
     prixParType: [
       {
-        type: { type: String, enum: ["base", "bargatere"], required: true },
+        type: { type: String, enum: ["base", "bargataire"], required: true },
         totalKg: { type: Number, required: true },
         prixKg: { type: Number, required: true },
         sousTotal: { type: Number, required: true },

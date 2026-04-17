@@ -4,7 +4,7 @@ const serviceStockCounterSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["semi-pret-base", "semi-pret-bargatere", "final-base", "final-bargatere"],
+      enum: ["semi-pret-base", "semi-pret-bargataire", "final-base", "final-bargataire"],
       required: true,
       unique: true,
     },

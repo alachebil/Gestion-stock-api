@@ -169,8 +169,8 @@ exports.createProduitFinal = async (req, res) => {
     if (!quantiteKg || quantiteKg <= 0) {
       return res.status(400).json({ message: "La quantité doit être supérieure à 0" });
     }
-    if (!type || !["base", "bargatere"].includes(type)) {
-      return res.status(400).json({ message: "Le type doit être 'base' ou 'bargatere'" });
+    if (!type || !["base", "bargataire"].includes(type)) {
+      return res.status(400).json({ message: "Le type doit être 'base' ou 'bargataire'" });
     }
 
     const consumed = Number(quantiteKg) + Number(quantiteKg) * 0.01;
@@ -358,25 +358,25 @@ exports.getStockSummary = async (req, res) => {
   try {
     const matiereCounter = await StockCounter.getOrCreate("matiere");
     const spBase = await StockCounter.getOrCreate("semi-pret-base");
-    const spBarg = await StockCounter.getOrCreate("semi-pret-bargatere");
+    const spBarg = await StockCounter.getOrCreate("semi-pret-bargataire");
     const fBase = await StockCounter.getOrCreate("final-base");
-    const fBarg = await StockCounter.getOrCreate("final-bargatere");
+    const fBarg = await StockCounter.getOrCreate("final-bargataire");
 
     const matiereCount = await MatierePremiere.countDocuments();
     const spBaseCount = await ProduitSemiPret.countDocuments({ type: "base" });
-    const spBargCount = await ProduitSemiPret.countDocuments({ type: "bargatere" });
+    const spBargCount = await ProduitSemiPret.countDocuments({ type: "bargataire" });
     const fBaseCount = await ProduitFinal.countDocuments({ type: "base" });
-    const fBargCount = await ProduitFinal.countDocuments({ type: "bargatere" });
+    const fBargCount = await ProduitFinal.countDocuments({ type: "bargataire" });
 
     res.status(200).json({
       matierePremieres: [{ _id: "Matière Première", totalKg: matiereCounter.totalKg, count: matiereCount }],
       produitsSemiPrets: [
         { _id: "Semi-Prêt Base", totalKg: spBase.totalKg, count: spBaseCount },
-        { _id: "Semi-Prêt Bargatère", totalKg: spBarg.totalKg, count: spBargCount },
+        { _id: "Semi-Prêt Bargataire", totalKg: spBarg.totalKg, count: spBargCount },
       ],
       produitsFinals: [
         { _id: "Final Base", totalKg: fBase.totalKg, count: fBaseCount },
-        { _id: "Final Bargatère", totalKg: fBarg.totalKg, count: fBargCount },
+        { _id: "Final Bargataire", totalKg: fBarg.totalKg, count: fBargCount },
       ],
     });
   } catch (error) {
@@ -389,15 +389,15 @@ exports.getStockCounters = async (req, res) => {
   try {
     const matiere = await StockCounter.getOrCreate("matiere");
     const spBase = await StockCounter.getOrCreate("semi-pret-base");
-    const spBarg = await StockCounter.getOrCreate("semi-pret-bargatere");
+    const spBarg = await StockCounter.getOrCreate("semi-pret-bargataire");
     const fBase = await StockCounter.getOrCreate("final-base");
-    const fBarg = await StockCounter.getOrCreate("final-bargatere");
+    const fBarg = await StockCounter.getOrCreate("final-bargataire");
     res.status(200).json({
       matiere: matiere.totalKg,
       semiPretBase: spBase.totalKg,
-      semiPretBargatere: spBarg.totalKg,
+      semiPretbargataire: spBarg.totalKg,
       finalBase: fBase.totalKg,
-      finalBargatere: fBarg.totalKg,
+      finalbargataire: fBarg.totalKg,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -409,19 +409,19 @@ exports.initCounters = async (req, res) => {
   try {
     const matiereAgg = await MatierePremiere.aggregate([{ $group: { _id: null, total: { $sum: "$quantiteKg" } } }]);
     const spBaseAgg = await ProduitSemiPret.aggregate([{ $match: { type: "base" } }, { $group: { _id: null, total: { $sum: "$quantiteKg" } } }]);
-    const spBargAgg = await ProduitSemiPret.aggregate([{ $match: { type: "bargatere" } }, { $group: { _id: null, total: { $sum: "$quantiteKg" } } }]);
+    const spBargAgg = await ProduitSemiPret.aggregate([{ $match: { type: "bargataire" } }, { $group: { _id: null, total: { $sum: "$quantiteKg" } } }]);
     const fBaseAgg = await ProduitFinal.aggregate([{ $match: { type: "base" } }, { $group: { _id: null, total: { $sum: "$quantiteKg" } } }]);
-    const fBargAgg = await ProduitFinal.aggregate([{ $match: { type: "bargatere" } }, { $group: { _id: null, total: { $sum: "$quantiteKg" } } }]);
+    const fBargAgg = await ProduitFinal.aggregate([{ $match: { type: "bargataire" } }, { $group: { _id: null, total: { $sum: "$quantiteKg" } } }]);
 
     const mc = await StockCounter.getOrCreate("matiere");
     mc.totalKg = matiereAgg[0]?.total || 0; await mc.save();
     const spb = await StockCounter.getOrCreate("semi-pret-base");
     spb.totalKg = spBaseAgg[0]?.total || 0; await spb.save();
-    const spbg = await StockCounter.getOrCreate("semi-pret-bargatere");
+    const spbg = await StockCounter.getOrCreate("semi-pret-bargataire");
     spbg.totalKg = spBargAgg[0]?.total || 0; await spbg.save();
     const fb = await StockCounter.getOrCreate("final-base");
     fb.totalKg = fBaseAgg[0]?.total || 0; await fb.save();
-    const fbg = await StockCounter.getOrCreate("final-bargatere");
+    const fbg = await StockCounter.getOrCreate("final-bargataire");
     fbg.totalKg = fBargAgg[0]?.total || 0; await fbg.save();
 
     await StockCounter.deleteMany({ type: { $in: ["semi-pret", "final"] } });
@@ -429,8 +429,8 @@ exports.initCounters = async (req, res) => {
     res.status(200).json({
       message: "Compteurs initialisés",
       matiere: mc.totalKg,
-      semiPretBase: spb.totalKg, semiPretBargatere: spbg.totalKg,
-      finalBase: fb.totalKg, finalBargatere: fbg.totalKg,
+      semiPretBase: spb.totalKg, semiPretbargataire: spbg.totalKg,
+      finalBase: fb.totalKg, finalbargataire: fbg.totalKg,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

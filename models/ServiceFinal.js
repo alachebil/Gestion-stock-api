@@ -5,7 +5,7 @@ const serviceFinalSchema = new mongoose.Schema(
     nom: { type: String, required: true },
     type: {
       type: String,
-      enum: ["base", "bargatere"],
+      enum: ["base", "bargataire"],
       required: true,
     },
     quantiteKg: { type: Number, required: true, default: 0 },
