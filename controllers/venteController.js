@@ -8,7 +8,7 @@ const Client = require("../models/Client");
 
 exports.createVente = async (req, res) => {
   try {
-    const { clientId, produitIds, prixParType, chauffeur, matriculation, source } = req.body;
+    const { clientId, produitIds, prixParType, chauffeur, matriculation, source, montantPaye } = req.body;
 
     if (!clientId || !produitIds?.length || !prixParType?.length || !chauffeur || !matriculation || !source) {
       return res.status(400).json({ message: "Tous les champs sont obligatoires" });
@@ -82,10 +82,11 @@ exports.createVente = async (req, res) => {
     await vente.save();
 
     // Auto-add to caisse
+    const montantCaisse = (montantPaye !== undefined && montantPaye !== null) ? Number(montantPaye) : totalGeneral;
     await CaisseEntry.create({
       type: "vente",
       description: `Vente ${source} - ${client.nom} - ${produits.length} produit(s)`,
-      montant: totalGeneral,
+      montant: montantCaisse,
       date: new Date(),
     });
 
