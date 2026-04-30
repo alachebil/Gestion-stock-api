@@ -14,6 +14,7 @@ const serviceFinalSchema = new mongoose.Schema(
       enum: ["dispo", "vendu"],
       default: "dispo",
     },
+    commentaire: { type: String, default: "" },
   },
   { timestamps: true }
 );

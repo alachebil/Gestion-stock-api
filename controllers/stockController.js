@@ -165,7 +165,7 @@ exports.updateProduitSemiPret = async (req, res) => {
 
 exports.createProduitFinal = async (req, res) => {
   try {
-    const { type, quantiteKg } = req.body;
+    const { type, quantiteKg, commentaire } = req.body;
     if (!quantiteKg || quantiteKg <= 0) {
       return res.status(400).json({ message: "La quantité doit être supérieure à 0" });
     }
@@ -201,7 +201,7 @@ exports.createProduitFinal = async (req, res) => {
     finalCounter.totalKg += Number(quantiteKg);
     await finalCounter.save();
 
-    const item = new ProduitFinal({ nom, type, quantiteKg: Number(quantiteKg) });
+    const item = new ProduitFinal({ nom, type, quantiteKg: Number(quantiteKg), commentaire: commentaire || "" });
     await item.save();
 
     await TransformationHistory.create({

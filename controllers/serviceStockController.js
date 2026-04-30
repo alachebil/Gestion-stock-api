@@ -78,7 +78,7 @@ exports.deleteSemiPret = async (req, res) => {
 
 exports.createFinal = async (req, res) => {
   try {
-    const { type, quantiteKg } = req.body;
+    const { type, quantiteKg, commentaire } = req.body;
     if (!quantiteKg || quantiteKg <= 0) {
       return res.status(400).json({ message: "La quantité doit être supérieure à 0" });
     }
@@ -114,7 +114,7 @@ exports.createFinal = async (req, res) => {
     finalCounter.totalKg += Number(quantiteKg);
     await finalCounter.save();
 
-    const item = new ServiceFinal({ nom, type, quantiteKg: Number(quantiteKg) });
+    const item = new ServiceFinal({ nom, type, quantiteKg: Number(quantiteKg), commentaire: commentaire || "" });
     await item.save();
 
     await ServiceTransformationHistory.create({
