@@ -16,8 +16,8 @@ exports.getAllEntries = async (req, res) => {
 exports.createEntry = async (req, res) => {
   try {
     const { type, description, montant, date } = req.body;
-    if (!type || !["depense", "vente"].includes(type)) {
-      return res.status(400).json({ message: "Le type doit être 'depense' ou 'vente'" });
+    if (!type || !["depense", "vente", "reste"].includes(type)) {
+      return res.status(400).json({ message: "Le type doit être 'depense', 'vente' ou 'reste'" });
     }
     if (!description || !montant || !date) {
       return res.status(400).json({ message: "Description, montant et date sont requis" });
@@ -77,6 +77,12 @@ exports.getSummary = async (req, res) => {
     ]);
     const ventes = ventesAgg[0]?.total || 0;
 
+    const restesAgg = await CaisseEntry.aggregate([
+      { $match: { type: "reste" } },
+      { $group: { _id: null, total: { $sum: "$montant" } } },
+    ]);
+    const restes = restesAgg[0]?.total || 0;
+
     const totalDepenses = depensesFacturesProd + depensesFacturesService + depensesManuelles;
     const solde = ventes - totalDepenses;
 
@@ -86,6 +92,7 @@ exports.getSummary = async (req, res) => {
       depensesManuelles,
       totalDepenses,
       ventes,
+      restes,
       solde,
     });
   } catch (error) {

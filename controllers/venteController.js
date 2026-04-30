@@ -90,6 +90,18 @@ exports.createVente = async (req, res) => {
       date: new Date(),
     });
 
+    // If montantPaye < totalGeneral, create a "reste" entry
+    if (montantPaye !== undefined && montantPaye !== null && Number(montantPaye) < totalGeneral) {
+      const reste = totalGeneral - Number(montantPaye);
+      const produitsNoms = produits.map((p) => p.nom).join(", ");
+      await CaisseEntry.create({
+        type: "reste",
+        description: `Reste à payer pour le client ${client.nom} pour le produit ${produitsNoms}`,
+        montant: reste,
+        date: new Date(),
+      });
+    }
+
     const populatedVente = await Vente.findById(vente._id).populate("client");
     res.status(201).json(populatedVente);
   } catch (error) {

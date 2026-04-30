@@ -4,7 +4,7 @@ const caisseEntrySchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["depense", "vente"],
+      enum: ["depense", "vente", "reste"],
       required: true,
     },
     description: { type: String, required: true },
