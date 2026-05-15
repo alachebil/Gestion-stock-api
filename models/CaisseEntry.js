@@ -10,6 +10,11 @@ const caisseEntrySchema = new mongoose.Schema(
     description: { type: String, required: true },
     montant: { type: Number, required: true },
     date: { type: Date, required: true },
+    paymentMethod: {
+      type: String,
+      enum: ["versement", "virement", "espece", null],
+      default: null,
+    },
   },
   { timestamps: true }
 );

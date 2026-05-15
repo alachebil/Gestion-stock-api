@@ -8,11 +8,14 @@ const Client = require("../models/Client");
 
 exports.createVente = async (req, res) => {
   try {
-    const { clientId, produitIds, prixParType, chauffeur, matriculation, source, montantPaye } = req.body;
+    const { clientId, produitIds, prixParType, chauffeur, matriculation, source, montantPaye, paymentMethod } = req.body;
 
     if (!clientId || !produitIds?.length || !prixParType?.length || !chauffeur || !matriculation || !source) {
       return res.status(400).json({ message: "Tous les champs sont obligatoires" });
     }
+
+    const allowedMethods = ["versement", "virement", "espece"];
+    const method = allowedMethods.includes(paymentMethod) ? paymentMethod : "espece";
 
     const client = await Client.findById(clientId);
     if (!client) return res.status(404).json({ message: "Client introuvable" });
@@ -69,6 +72,14 @@ exports.createVente = async (req, res) => {
       quantiteKg: p.quantiteKg,
     }));
 
+    // Compute per-day sequential index (race-safe enough within a single Node process)
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+    const todayCount = await Vente.countDocuments({ dateVente: { $gte: startOfDay, $lt: endOfDay } });
+    const dailyIndex = todayCount + 1;
+
     const vente = new Vente({
       client: clientId,
       produits: produitsData,
@@ -77,6 +88,8 @@ exports.createVente = async (req, res) => {
       chauffeur,
       matriculation,
       source,
+      paymentMethod: method,
+      dailyIndex,
       dateVente: new Date(),
     });
     await vente.save();
@@ -88,6 +101,7 @@ exports.createVente = async (req, res) => {
       description: `Vente ${source} - ${client.nom} - ${produits.length} produit(s)`,
       montant: montantCaisse,
       date: new Date(),
+      paymentMethod: method,
     });
 
     // If montantPaye < totalGeneral, create a "reste" entry

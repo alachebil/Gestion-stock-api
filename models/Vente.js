@@ -31,6 +31,12 @@ const venteSchema = new mongoose.Schema(
       enum: ["production", "service"],
       required: true,
     },
+    paymentMethod: {
+      type: String,
+      enum: ["versement", "virement", "espece"],
+      default: "espece",
+    },
+    dailyIndex: { type: Number, default: 1 },
     dateVente: { type: Date, default: Date.now },
   },
   { timestamps: true }
